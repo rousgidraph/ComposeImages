@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -62,4 +64,25 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_ui_version"
 
     implementation "io.coil-kt:coil-compose:2.1.0"
+
+    // compose hilt navigation
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+    // compose viewmodel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
+
+    // hilt
+    implementation 'com.google.dagger:hilt-android:2.43'
+    kapt 'com.google.dagger:hilt-compiler:2.43'
+
+    // retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+
+    //jackson
+    implementation 'com.squareup.retrofit2:converter-moshi:2.9.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
 }

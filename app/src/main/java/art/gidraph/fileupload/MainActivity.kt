@@ -7,6 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,42 +16,50 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.net.toFile
 import art.gidraph.fileupload.ui.theme.FileUploadTheme
+import art.gidraph.fileupload.viewmodel.ImageViewModel
 import coil.compose.AsyncImage
+import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
 
-class MainActivity : ComponentActivity() {
+@AndroidEntryPoint
+class MainActivity : ComponentActivity(
+
+) {
+    private val imageViewModel: ImageViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             FileUploadTheme {
-                var selectedImageUri by remember{
+                var selectedImageUri by remember {
                     mutableStateOf<Uri?>(null)
                 }
 
-                var selectedImageUris by remember{
+                var selectedImageUris by remember {
                     mutableStateOf<List<Uri>>(emptyList())
                 }
 
                 val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.PickVisualMedia(),
-                    onResult = {uri -> selectedImageUri = uri}
+                    onResult = { uri -> selectedImageUri = uri }
                 )
 
 
                 val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.PickMultipleVisualMedia(),
-                    onResult = {uris -> selectedImageUris = uris}
+                    onResult = { uris -> selectedImageUris = uris }
                 )
 
 
-                LazyColumn(modifier = Modifier.fillMaxSize()){
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -73,20 +83,40 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    item{
+                    item {
                         AsyncImage(
                             model = selectedImageUri,
                             contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.Crop)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val tempFile = File(cacheDir,"handsomedog.jpg")
+                                    tempFile.createNewFile()
+                                    tempFile.outputStream().use {
+                                        assets.open("20210812_125352.jpg").copyTo(it)
+                                    }
+                                    imageViewModel.uploadFile(tempFile)
+                                },
+                            contentScale = ContentScale.Crop
+                        )
                     }
 
-                    items(selectedImageUris){uri ->
+                    items(selectedImageUris) { uri ->
                         AsyncImage(
                             model = uri,
                             contentDescription = null,
-                            modifier = Modifier.fillMaxWidth(),
-                            contentScale = ContentScale.Crop)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val tempFile = File(cacheDir,"handsomedog.jpg")
+                                    tempFile.createNewFile()
+                                    tempFile.outputStream().use {
+                                        assets.open("20210812_125352.jpg").copyTo(it)
+                                    }
+                                    imageViewModel.uploadFile(tempFile)
+                                },
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 }
 
