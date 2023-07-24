@@ -2,6 +2,7 @@ package art.gidraph.fileupload
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -90,11 +91,15 @@ class MainActivity : ComponentActivity(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val tempFile = File(cacheDir,"handsomedog.jpg")
+                                    val tempFile = File(cacheDir, "handsomedog.jpg")
                                     tempFile.createNewFile()
-                                    tempFile.outputStream().use {
-                                        assets.open("20210812_125352.jpg").copyTo(it)
-                                    }
+                                    tempFile
+                                        .outputStream()
+                                        .use {
+                                            assets
+                                                .open("20210812_125352.jpg")
+                                                .copyTo(it)
+                                        }
                                     imageViewModel.uploadFile(tempFile)
                                 },
                             contentScale = ContentScale.Crop
@@ -108,11 +113,20 @@ class MainActivity : ComponentActivity(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val tempFile = File(cacheDir,"handsomedog.jpg")
+                                    val type = contentResolver.getType(uri)
+                                    val tempFile = File(cacheDir, uri.pathSegments.last()+".jpg")
+                                    Log.i("File type", "file name and type "+uri.pathSegments.last()+"."+type)
                                     tempFile.createNewFile()
-                                    tempFile.outputStream().use {
-                                        assets.open("20210812_125352.jpg").copyTo(it)
-                                    }
+                                    tempFile
+                                        .outputStream()
+                                        .use {
+//                                        assets.open("20210812_125352.jpg").copyTo(it)
+                                            contentResolver
+                                                .openInputStream(uri)!!
+                                                .copyTo(it)
+
+                                        }
+
                                     imageViewModel.uploadFile(tempFile)
                                 },
                             contentScale = ContentScale.Crop
