@@ -91,15 +91,20 @@ class MainActivity : ComponentActivity(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    val tempFile = File(cacheDir, "handsomedog.jpg")
+                                    val type = contentResolver.getType(selectedImageUri!!)
+                                    val tempFile = File(cacheDir, selectedImageUri!!.pathSegments.last()+".jpg")
+                                    Log.i("File type", "file name and type "+selectedImageUri!!.pathSegments.last()+"."+type)
                                     tempFile.createNewFile()
                                     tempFile
                                         .outputStream()
                                         .use {
-                                            assets
-                                                .open("20210812_125352.jpg")
+//                                        assets.open("20210812_125352.jpg").copyTo(it)
+                                            contentResolver
+                                                .openInputStream(selectedImageUri!!)!!
                                                 .copyTo(it)
+
                                         }
+
                                     imageViewModel.uploadFile(tempFile)
                                 },
                             contentScale = ContentScale.Crop
